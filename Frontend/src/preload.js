@@ -1,3 +1,4 @@
+const { channel } = require("diagnostics_channel");
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
@@ -6,5 +7,11 @@ contextBridge.exposeInMainWorld("api", {
   },
   receive: (channel, func) => {
     ipcRenderer.on(channel, (event, ...args) => func(...args));
+  },
+  login: (channel, data) => {
+    ipcRenderer.send(channel, data);
+  },
+  connect: (channel, data) => {
+    ipcRenderer.send(channel, data);
   },
 });

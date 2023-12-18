@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Menu, ipcMain } = require("electron");
 const io = require("socket.io-client");
 const path = require("path");
+const axios = require("axios");
+
+const Store = require("electron-store");
+const store = new Store();
 
 let socket;
 
@@ -30,16 +34,36 @@ function createWindow() {
 
   win.loadFile("./app/index.html");
 
-  // Connect to the socket server
-  socket = io("http://localhost:3000");
-
-  socket.on("receive-message", (data) => {
-    // Send the received message to the renderer process
-    win.webContents.send("receive-message", data);
+  ipcMain.on("connect", (event, data) => {
+    try{
+        console.log("Connecting to server");
+        const token = store.get("token");
+        socket = io("http://localhost:3000", {
+          query: { token },
+        })
+    } catch (err) {
+        console.log(err);
+    }
   });
 
   ipcMain.on("send-to-server", (event, data) => {
     socket.emit("send-message", data);
+  });
+
+  ipcMain.on("login", (event, data) => {
+    axios
+      .post("http://localhost:3000/api/login", {
+        username: data.username,
+        password: data.password,
+      })
+      .then((res) => {
+        console.log("Logged in successfully");
+        console.log(res.data);
+        store.set("token", res.data);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
   });
 }
 
