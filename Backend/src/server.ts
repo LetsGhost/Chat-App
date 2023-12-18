@@ -1,10 +1,18 @@
 import express from "express";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import jwt from "jsonwebtoken"; // Assuming you're using jsonwebtoken for JWT handling
+import jwt from "jsonwebtoken";
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 // Create a new express application instance
 const app: express.Application = express();
+
+app.use(bodyParser.json());
+app.use(cookieParser());
+
+import AuthRoute from "./app/routes/AuthRoute";
+app.use("/api", AuthRoute)
 
 // Create a new http server instance
 const httpServer = createServer(app);
