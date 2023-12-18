@@ -6,14 +6,7 @@ class AuthController {
     const { username, password } = req.body;
     const token = await AuthService.login(username, password);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      maxAge: 3600000,
-      sameSite: "none",
-      secure: true,
-    });
-
-    res.json({ token });
+    res.json(token);
   }
 }
 

@@ -28,9 +28,11 @@ declare module "socket.io" {
 
 // Middleware for authentication
 io.use((socket, next) => {
+  console.log("middleware");
   const token = socket.handshake.query.token as string;
   jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
+      console.log('JWT verification error:', err);
       return next(new Error("Authentication error"));
     }
     if (typeof decoded === "object" && decoded !== null) {
@@ -46,7 +48,7 @@ io.on("connection", (socket) => {
 
   // Listen for custom event from clients
   socket.on("send-message", (data) => {
-    console.log(`message from user ${socket.userId}: ${data}`);
+    console.log(`message from user ${socket.userId}: ${data.data.message}`);
 
     // Emit the message to all connected clients
     io.emit("receive-message", data);
