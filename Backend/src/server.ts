@@ -1,6 +1,7 @@
-import express from 'express';
-import { Server } from 'socket.io';
-import { createServer } from 'http';
+import express from "express";
+import { Server } from "socket.io";
+import { createServer } from "http";
+import jwt from "jsonwebtoken"; // Assuming you're using jsonwebtoken for JWT handling
 
 // Create a new express application instance
 const app: express.Application = express();
@@ -11,22 +12,45 @@ const httpServer = createServer(app);
 // Create a new socket.io server instance
 const io = new Server(httpServer);
 
+declare module "socket.io" {
+  export interface Socket {
+    userId?: string;
+  }
+}
+
+// Middleware for authentication
+io.use((socket, next) => {
+  const token = socket.handshake.query.token as string;
+  jwt.verify(token, "secret", (err, decoded) => {
+    if (err) {
+      return next(new Error("Authentication error"));
+    }
+    if (typeof decoded === "object" && decoded !== null) {
+      socket.userId = decoded.id;
+    }
+    next();
+  });
+});
+
 // Listen for connection events from clients
-io.on('connection', (socket) => {
-    console.log('a user connected');
+io.on("connection", (socket) => {
+  console.log(`a user connected: ${socket.userId}`);
 
-    // Listen for custom event from clients
-    socket.on('my event', (data) => {
-        console.log(data);
-    });
+  // Listen for custom event from clients
+  socket.on("send-message", (data) => {
+    console.log(`message from user ${socket.userId}: ${data}`);
 
-    // Listen for disconnect event
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
+    // Emit the message to all connected clients
+    io.emit("receive-message", data);
+  });
+
+  // Listen for disconnect event
+  socket.on("disconnect", () => {
+    console.log(`user disconnected: ${socket.userId}`);
+  });
 });
 
 // Start the http server listening for requests
 httpServer.listen(3000, () => {
-    console.log('listening on *:3000');
+  console.log("listening on *:3000");
 });
