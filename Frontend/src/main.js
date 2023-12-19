@@ -30,6 +30,13 @@ function createWindow() {
             win.reload();
           }
         },
+        { 
+          label: "Reload without disconnect",
+          shortcut: "F11",
+          click: () => {
+            win.reload();
+          }
+        },
         { role: "toggledevtools" },
       ],
     },
