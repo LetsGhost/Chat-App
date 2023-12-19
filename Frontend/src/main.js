@@ -22,9 +22,14 @@ function createWindow() {
     {
       label: "Dev Tools",
       submenu: [
-        { role: "reload" },
-        { role: "forcereload" },
-        { type: "separator" },
+        { 
+          label: "Reload",
+          shortcut: "F11",
+          click: () => {
+            socket.disconnect();
+            win.reload();
+          }
+        },
         { role: "toggledevtools" },
       ],
     },
@@ -34,6 +39,7 @@ function createWindow() {
 
   win.loadFile("./app/index.html");
 
+  // Connect to server
   ipcMain.on("connect", (event, data) => {
     try{
         console.log("Connecting to server");
@@ -41,15 +47,21 @@ function createWindow() {
         socket = io("http://localhost:3000", {
           query: { token },
         })
+
+        socket.on("receive-message", (data) => {
+          win.webContents.send("receive", data);
+        })
     } catch (err) {
         console.log(err);
     }
   });
 
+  // Send message to server
   ipcMain.on("send-to-server", (event, data) => {
     socket.emit("send-message", data);
   });
 
+  // Login
   ipcMain.on("login", (event, data) => {
     axios
       .post("http://localhost:3000/api/login", {
@@ -58,7 +70,6 @@ function createWindow() {
       })
       .then((res) => {
         console.log("Logged in successfully");
-        console.log(res.data);
         store.set("token", res.data);
       })
       .catch((err) => {
