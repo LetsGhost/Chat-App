@@ -23,12 +23,12 @@ const io = new Server(httpServer);
 declare module "socket.io" {
   export interface Socket {
     userId?: string;
+    username?: string;
   }
 }
 
 // Middleware for authentication
 io.use((socket, next) => {
-  console.log("middleware");
   const token = socket.handshake.query.token as string;
   jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
@@ -37,6 +37,8 @@ io.use((socket, next) => {
     }
     if (typeof decoded === "object" && decoded !== null) {
       socket.userId = decoded.id;
+      socket.username = decoded.username;
+      
     }
     next();
   });
@@ -45,6 +47,7 @@ io.use((socket, next) => {
 // Listen for connection events from clients
 io.on("connection", (socket) => {
   console.log(`a user connected: ${socket.userId}`);
+  io.emit("user-connected", socket.username);
 
   // Listen for custom event from clients
   socket.on("send-message", (data) => {
@@ -57,6 +60,7 @@ io.on("connection", (socket) => {
   // Listen for disconnect event
   socket.on("disconnect", () => {
     console.log(`user disconnected: ${socket.userId}`);
+    io.emit("user-disconnected", socket.username);
   });
 });
 
