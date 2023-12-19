@@ -4,6 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        input, button {
+            margin: 5px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        input[type="text"] {
+            background-color: #333;
+            color: #fff;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #messages {
+            background-color: #333;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        #messages p {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <input type="text" name="username" id="username" placeholder="username">
@@ -12,9 +50,9 @@
     <div id="messages">
         <p><big>Messages will appear here:</big></p>
     </div>
-    <label for="messagebox"></label>
-    <textarea name="messagebox" id="messagebox" cols="10" rows="1"></textarea>
-    <button id="send">Send</button>
+    <label for="messagebox" hidden></label>
+    <input type="text" id="messagebox" name="messagebox" hidden>
+    <button id="send" hidden>Send</button>
     <script>
         const messageBox = document.getElementById("messagebox")
         const messagesDiv = document.getElementById("messages")
@@ -44,6 +82,12 @@
 
             user = username
 
+            document.getElementById("username").hidden = true
+            document.getElementById("password").hidden = true
+            document.getElementById("submit").hidden = true
+
+            document.getElementById("messagebox").hidden = false
+            document.getElementById("send").hidden = false
         })
 
         // Receive messages
