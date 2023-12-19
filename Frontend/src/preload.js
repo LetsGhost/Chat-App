@@ -14,4 +14,10 @@ contextBridge.exposeInMainWorld("api", {
   connect: (channel, data) => {
     ipcRenderer.send(channel, data);
   },
+  userConnected: (channel, func) => {
+    ipcRenderer.on(channel, (event, ...args) => func(...args));
+  },
+  userDisconnected: (channel, func) => {
+    ipcRenderer.on(channel, (event, ...args) => func(...args));
+  },
 });

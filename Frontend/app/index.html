@@ -46,48 +46,49 @@
 
       /* Styling for the login overlay */
       #loginOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-            z-index: 1; /* Lower z-index than the popup */
-            display: none; /* Hidden by default */
-        }
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+        z-index: 1; /* Lower z-index than the popup */
+        display: none; /* Hidden by default */
+      }
 
       /* Styling for the login popup */
       #loginPopup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 2; /* Higher z-index to appear above other elements */
-            display: block; /* Hidden by default */
-        }
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #333;
+        padding: 20px;
+        border-radius: 10px;
+        z-index: 2; /* Higher z-index to appear above other elements */
+        display: block; /* Hidden by default */
+      }
 
-        #loginPopup input, #loginPopup button {
-            display: block;
-            margin: 10px 0;
-        }
+      #loginPopup input,
+      #loginPopup button {
+        display: block;
+        margin: 10px 0;
+      }
     </style>
   </head>
   <body>
-    <div id="loginOverlay"></div>
+    <div id="online"></div>
     <div id="loginPopup">
-        <input type="text" name="username" id="username" placeholder="username" />
-        <input type="text" name="password" id="password" placeholder="password" />
-        <button id="submit">Submit</button>
+      <input type="text" name="username" id="username" placeholder="username" />
+      <input type="text" name="password" id="password" placeholder="password" />
+      <button id="submit">Submit</button>
     </div>
     <div id="messages">
       <p><big>Messages will appear here:</big></p>
     </div>
-    <label for="messagebox" ></label>
+    <label for="messagebox"></label>
     <input type="text" id="messagebox" name="messagebox" />
-    <button id="send" >Send</button>
+    <button id="send">Send</button>
     <script>
       const messageBox = document.getElementById("messagebox");
       const messagesDiv = document.getElementById("messages");
@@ -127,6 +128,15 @@
         messageElement.textContent =
           receivedData.user + ": " + receivedData.message;
         messagesDiv.appendChild(messageElement);
+      });
+
+      const online = document.getElementById("online");
+      window.api.userConnected("userConnected", (data) => {
+        online.appendChild(document.createTextNode(data + " is online"));
+      });
+
+      window.api.userDisconnected("userDisconnected", (data) => {
+        online.appendChild(document.createTextNode(data + " is offline"));
       });
     </script>
   </body>

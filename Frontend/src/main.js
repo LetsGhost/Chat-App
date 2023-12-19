@@ -27,6 +27,7 @@ function createWindow() {
           shortcut: "F11",
           click: () => {
             socket.disconnect();
+            store.clear();
             win.reload();
           }
         },
@@ -34,6 +35,7 @@ function createWindow() {
           label: "Reload without disconnect",
           shortcut: "F11",
           click: () => {
+            store.clear();
             win.reload();
           }
         },
@@ -57,6 +59,15 @@ function createWindow() {
 
         socket.on("receive-message", (data) => {
           win.webContents.send("receive", data);
+        })
+
+        socket.on("user-connected", (data) => {
+          win.webContents.send("userConnected", data);
+        })
+
+        socket.on("user-disconnected", (data) => {
+          console.log(data);
+          win.webContents.send("userDisconnected", data);
         })
     } catch (err) {
         console.log(err);
@@ -89,6 +100,7 @@ app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
+    store.clear();
     app.quit();
   }
 });
